@@ -5,6 +5,37 @@ import (
 	"strings"
 )
 
+func compareStrings(input1, input2 string) bool {
+
+	diffCount := 0
+
+	for index,_ := range input1 {
+		if (input1[index] != input2[index]) {
+			diffCount++
+		}
+
+		if (diffCount > 1) {
+			return false
+		}
+	}
+	
+	return diffCount == 1 
+}
+
+func findBoxHash(boxList []string) string {
+	for i:=0;i<len(boxList);i++ {
+		for j:=i;j<len(boxList);j++ {
+			if (compareStrings(boxList[i],boxList[j])) {
+				fmt.Println("Box 1: ", boxList[i])
+				fmt.Println("Box 2: ", boxList[j])
+				return boxList[i]
+			}
+		}
+	}
+
+	return "";
+}
+
 func hasCharacterCount(input string, count int) bool {
 
 	letterCount  := make(map[rune]int)
@@ -48,3 +79,14 @@ func DayTwoPartOne() {
 
 	fmt.Println("Checksum: ", checksum)
 }
+
+func DayTwoPartTwo() {
+	fmt.Println("Day Two - Part Two")
+
+	input := ReadFile("day2-input.txt")
+	boxes := strings.Split(input, "\n")
+
+	hash := findBoxHash(boxes)
+
+	fmt.Println("Box Hash: ", hash)
+}		
