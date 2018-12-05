@@ -44,6 +44,9 @@ func DayThreePartOne() {
 
 	fmt.Println("Overlap count: ", overlapCount)
 
+	for i := 0; i < len(boxList); i++ {
+		checkBoxForOverlap(fabric, boxList[i])
+	}
 }
 
 func parseStringToBox(stringDescription string) box {
@@ -77,11 +80,25 @@ func createFabric(size int) [][]int {
 
 func addBoxToFabric(fabric [][]int, box box) {
 
-	fmt.Println("Add box: ", box.id)
-
 	for i := box.left; i < box.left+box.width; i++ {
 		for j := box.top; j < box.top+box.height; j++ {
 			fabric[i][j] = fabric[i][j] + 1
 		}
+	}
+}
+
+func checkBoxForOverlap(fabric [][]int, box box) {
+
+	overlap := false
+	for i := box.left; i < box.left+box.width; i++ {
+		for j := box.top; j < box.top+box.height; j++ {
+			if fabric[i][j] > 1 {
+				overlap = true
+			}
+		}
+	}
+
+	if !overlap {
+		fmt.Println("No overlap for box: ", box.id)
 	}
 }
