@@ -66,12 +66,29 @@ func DayFourPartOne() {
 	sort.Sort(logEntryList(logList))
 
 	sleepyGuard := findGuardWhoSleepsMost(logList)
-	sleepyMinute := findMostMinuteSlept(sleepyGuard, logList)
+	sleepyMinute, _ := findMostMinuteSlept(sleepyGuard, logList)
 
 	fmt.Println("Sleepy Guard: ", sleepyGuard)
 	fmt.Println("Sleepy Minute: ", sleepyMinute)
 }
 
+func DayFourPartTwo() {
+
+	fmt.Println("Day Four - Part Two")
+
+	input := ReadFile("day4-input.txt")
+	inputList := strings.Split(input, "\n")
+
+	logList := make([]logEntry, len(inputList))
+
+	for i := 0; i < len(inputList); i++ {
+		logList[i] = parseLogEntry(inputList[i])
+	}
+
+	sort.Sort(logEntryList(logList))
+
+	findGuardWhoSleepsAtTheSameTime(logList)
+}
 func parseLogEntry(rawLog string) logEntry {
 	date := rawLog[1:11]
 	year, _ := strconv.Atoi(date[0:4])
@@ -141,8 +158,7 @@ func findGuardWhoSleepsMost(logList []logEntry) string {
 	return ourGuy
 }
 
-func findMostMinuteSlept(guard string, logList []logEntry) int {
-
+func findMostMinuteSlept(guard string, logList []logEntry) (int, int) {
 	sleepMinutes := make([]int, 60)
 
 	for i := 0; i < len(logList); i++ {
@@ -165,9 +181,52 @@ func findMostMinuteSlept(guard string, logList []logEntry) int {
 	for i := 0; i < len(sleepMinutes); i++ {
 		if sleepMinutes[i] >= maxSleep {
 			maxMinute = i
+
 			maxSleep = sleepMinutes[i]
 		}
 	}
+	return maxMinute, maxSleep
+}
 
-	return maxMinute
+func findGuards(logList []logEntry) []string {
+
+	guardName := make(map[string]bool)
+
+	for i := 0; i < len(logList); i++ {
+		if strings.HasPrefix(logList[i].logText, "Guard") {
+
+			guardName[logList[i].logText] = true
+		}
+	}
+
+	guards := make([]string, len(guardName))
+	i := 0
+	for key, _ := range guardName {
+		guards[i] = key
+		i++
+	}
+	return guards
+}
+
+func findGuardWhoSleepsAtTheSameTime(logList []logEntry) {
+	guards := findGuards(logList)
+	fmt.Println(guards)
+
+	bestGuard := ""
+	bestMinute := 0
+	bestMinuteCount := 0
+
+	for i := 0; i < len(guards); i++ {
+		guard := guards[i]
+		guardMinute, guardMinuteCount := findMostMinuteSlept(guard, logList)
+		if guardMinuteCount > bestMinuteCount {
+			bestGuard = guard
+			bestMinute = guardMinute
+			bestMinuteCount = guardMinuteCount
+		}
+	}
+
+	fmt.Println("Best Guard: ", bestGuard)
+	fmt.Println("Best Minutes: ", bestMinute)
+	fmt.Println("Best Count: ", bestMinuteCount)
 }
