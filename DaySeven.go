@@ -51,7 +51,6 @@ func DaySevenPartOne() {
 	fmt.Println("Output: ", output)
 }
 
-
 func DaySevenPartTwo() {
 	fmt.Println("Day 7 - Part Two")
 
@@ -78,36 +77,44 @@ func DaySevenPartTwo() {
 	maxWorkers := 5
 	workers := make(map[string]int)
 
-	for len(stateMap) > 0 {
-
-		for state,time := range workers {
-			workers[state] = time -1
-			//TODO check for done states
+	for len(stateMap) > 0 || len(workers) > 0 {
+		for state, time := range workers {
+			workers[state] = time - 1
 			if workers[state] == 0 {
 				delete(workers, state)
 				delete(stateMap, state)
-				for _,preState := range stateMap {
+				for _, preState := range stateMap {
 					delete(preState, state)
 				}
 				output += state
-				fmt.Println("output: ", output)
 			}
 		}
-		
+
 		if len(workers) < maxWorkers {
 			//Look for somethhing to do
+			spareWorkers := maxWorkers - len(workers)
+			for i := 0; i < spareWorkers; i++ {
+
+				startingStep := "["
+				foundWork := false
+				for step, preSteps := range stateMap {
+
+					if len(preSteps) == 0 && step < startingStep {
+						startingStep = step
+						foundWork = true
+					}
+
+				}
+
+				if foundWork {
+					delete(stateMap, startingStep)
+					workers[startingStep] = int(startingStep[0]) - 64 + 60
+				}
+			}
 		}
 		currentTime++
 	}
 
-	for state, _ := range stateMap {
-
-		bob := int(state[0]) - 64
-		fmt.Println("State: ", state[0:1], ", Value: ", bob)	
-		
-		currentTime++
-	}	
-
-	fmt.Println("Elapsed Time: ", currentTime)
+	fmt.Println("Elapsed Time: ", currentTime-1)
 	fmt.Println("Output: ", output)
 }
