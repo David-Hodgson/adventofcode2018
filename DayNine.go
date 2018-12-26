@@ -4,6 +4,60 @@ import (
 	"fmt"
 )
 
+type circle struct {
+	size        int
+	currentItem *circleItem
+}
+
+type circleItem struct {
+	marbleValue int64
+	next        *circleItem
+	previous    *circleItem
+}
+
+func (c *circle) moveNext() {
+	c.currentItem = c.currentItem.next
+}
+
+func (c *circle) movePrevious() {
+	c.currentItem = c.currentItem.previous
+}
+
+func (c *circle) add(newValue int64) {
+
+	if c.size == 0 {
+		circle1 := circleItem{}
+		circle1.marbleValue = newValue
+		circle1.next = &circle1
+		circle1.previous = &circle1
+		c.size++
+		c.currentItem = &circle1
+	} else {
+		current := c.currentItem
+		c.size++
+		next := current.next
+
+		circle1 := circleItem{}
+		circle1.marbleValue = newValue
+		circle1.next = next
+		circle1.previous = current
+
+		next.previous = &circle1
+		current.next = &circle1
+
+		c.currentItem = &circle1
+	}
+}
+
+func (c *circle) remove() {
+	previous := c.currentItem.previous
+	next := c.currentItem.next
+	next.previous = previous
+	previous.next = next
+
+	c.currentItem = next
+}
+
 func DayNinePartOne() {
 	fmt.Println("Day 9 - Part One")
 
@@ -23,45 +77,27 @@ func DayNinePartTwo() {
 
 func playGame(numberOfPlayers int, totalNumberOfMarbles int) {
 	currentPlayer := 1
-	currentMarblePosition := 0
 
-	circle := make([]int, 1)
-	circle[0] = 0
-
-	playerScores := make(map[int]int)
+	circle := circle{}
+	circle.add(0)
+	playerScores := make(map[int]int64)
 
 	for i := 1; i <= totalNumberOfMarbles; i++ {
 
-		if i%10000 == 0 {
-			fmt.Println("Player ", currentPlayer, " is placing marble ", i)
-		}
-
-		//fmt.Println(circle)
 		//Check rules
 		if i%23 == 0 {
-			//fmt.Println("Special Rules")
-			playerScores[currentPlayer] = playerScores[currentPlayer] + i
-			removalPosition := currentMarblePosition - 7
-			if removalPosition < 0 {
-				removalPosition += len(circle)
+			playerScores[currentPlayer] = playerScores[currentPlayer] + int64(i)
+			for x := 0; x < 7; x++ {
+				circle.movePrevious()
 			}
-			//marbleScore := i + circle[removalPosition]
-			//fmt.Println("Marble score: ", marbleScore)
-			//fmt.Println(playerScores)
-			playerScores[currentPlayer] = playerScores[currentPlayer] + circle[removalPosition]
-			circle = append(circle[:removalPosition], circle[removalPosition+1:]...)
-			currentMarblePosition = removalPosition
+			playerScores[currentPlayer] = playerScores[currentPlayer] + circle.currentItem.marbleValue
+			circle.remove()
 		} else {
 			//place marble in correct position
-			nextPosition := currentMarblePosition + 2
-			if nextPosition > len(circle) {
-				nextPosition = nextPosition - len(circle)
+			for x := 0; x < 1; x++ {
+				circle.moveNext()
 			}
-			//fmt.Println("inserting at position ", nextPosition)
-			circle = append(circle, 0)
-			copy(circle[nextPosition:], circle[nextPosition-1:])
-			circle[nextPosition] = i
-			currentMarblePosition = nextPosition
+			circle.add(int64(i))
 		}
 		//play moves to next player
 		currentPlayer++
@@ -70,7 +106,7 @@ func playGame(numberOfPlayers int, totalNumberOfMarbles int) {
 		}
 	}
 
-	maxScore := 0
+	maxScore := int64(0)
 	maxPlayer := 0
 	for playerScore, score := range playerScores {
 		if score > maxScore {
