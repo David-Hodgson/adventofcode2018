@@ -34,7 +34,7 @@ func DayTwelvePartOne() {
 		fmt.Println("\tOld Next State: ", nextState)
 //		fmt.Println("offset:= ", offset)
 
-		for i :=offset ; i < len(currentState)-2; i++ {
+		for i :=3 ; i < len(currentState)-2; i++ {
 			//fmt.Println("i: ", i, " - ", currentState[i-2:i+3])
 			if plant,exists := rules[currentState[i-2:i+3]]; exists{
 				//fmt.Println("pos: ", i, " matches: ", currentState[i-2:i+3])
@@ -46,8 +46,20 @@ func DayTwelvePartOne() {
 		fmt.Println("\tNew Next State: ", nextState)
 		currentState = nextState
 
-		if strings.Index(currentState, "#") <= offset {
+		if strings.Index(currentState, "#") <= 3 {
 			currentState = "." + currentState
+			offset++
 		}
 	}
+
+	fmt.Println("Offset: ", offset)
+
+	total :=0
+	for i := 0; i<len(currentState); i++ {
+		if (currentState[i] == '#') {
+			total += i-offset
+		}
+	}
+
+	fmt.Println("Total: ", total)
 }
