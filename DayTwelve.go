@@ -8,13 +8,20 @@ import (
 func DayTwelvePartOne() {
 	fmt.Println("Day 12 - Part One")
 
-	initalState := "#..#.#..##......###...###"
+	//initalState := "#..#.#..##......###...###"
 
-	ruleInput := strings.Split("...## => #\n..#.. => #\n.#... => #\n.#.#. => #\n.#.## => #\n.##.. => #\n.#### => #\n#.#.# => #\n#.### => #\n##.#. => #\n##.## => #\n###.. => #\n###.# => #\n####. => #", "\n")
+	//ruleInput := strings.Split("...## => #\n..#.. => #\n.#... => #\n.#.#. => #\n.#.## => #\n.##.. => #\n.#### => #\n#.#.# => #\n#.### => #\n##.#. => #\n##.## => #\n###.. => #\n###.# => #\n####. => #", "\n")
 
+	input := strings.Split(ReadFile("day12-input.txt"), "\n")
+
+	//fmt.Println(input)
+
+	initalState := input[0][len("initial state: "):]
+	//fmt.Println(input[2:])
+	ruleInput := input[2:]
 	rules := make(map[string]byte)
 
-	for i := 0; i<len(ruleInput); i++ {
+	for i := 0; i < len(ruleInput); i++ {
 
 		ruleParts := strings.Split(ruleInput[i], " => ")
 		rules[ruleParts[0]] = ruleParts[1][0]
@@ -23,43 +30,57 @@ func DayTwelvePartOne() {
 	fmt.Println("Initial State: ", initalState)
 	fmt.Println("Rules: ", rules)
 
-	currentState := "..." + initalState
-	offset := 3
-	for second :=1; second <= 20; second++ {
-		fmt.Println(second, ":")
-		currentState = currentState + ".."
+	currentState := initalState
+	offset := 100
+	for padding := 0; padding < offset; padding++ {
+		currentState = "." + currentState + "."
+	}
+	for second := 1; second <= 20; second++ {
+		fmt.Println(second, ":", " currentLength: ", len(currentState)+2)
+		currentState = currentState // + ".."
 		nextState := currentState
 
-	//	fmt.Println("Current State: ", currentState)
-		fmt.Println("\tOld Next State: ", nextState)
-//		fmt.Println("offset:= ", offset)
+		//	fmt.Println("Current State: ", currentState)
+		//	fmt.Println("\tOld Next State: ", nextState)
+		//	fmt.Println("offset:= ", offset)
 
-		for i :=3 ; i < len(currentState)-2; i++ {
-			//fmt.Println("i: ", i, " - ", currentState[i-2:i+3])
-			if plant,exists := rules[currentState[i-2:i+3]]; exists{
-				//fmt.Println("pos: ", i, " matches: ", currentState[i-2:i+3])
+		for i := 3; i < len(currentState)-2; i++ {
+			//		fmt.Println("i: ", i, " - ", currentState[i-2:i+3])
+			if plant, exists := rules[currentState[i-2:i+3]]; exists {
+				//fmt.Println("\tpos: ", i, " matches: ", currentState[i-2:i+3], " - output: ", string(plant))
 				nextState = nextState[:i] + string(plant) + nextState[i+1:]
 			} else {
 				nextState = nextState[:i] + "." + nextState[i+1:]
 			}
+
 		}
-		fmt.Println("\tNew Next State: ", nextState)
+		//	fmt.Println("\tNew Next State: ", nextState)
 		currentState = nextState
 
-		if strings.Index(currentState, "#") <= 3 {
-			currentState = "." + currentState
-			offset++
-		}
+		//	if strings.Index(currentState, "#") <= 3 {
+		//		currentState = "." + currentState
+		//		offset++
+		//	}
 	}
 
 	fmt.Println("Offset: ", offset)
 
-	total :=0
-	for i := 0; i<len(currentState); i++ {
-		if (currentState[i] == '#') {
-			total += i-offset
+	total := 0
+	minPlant := len(currentState)
+	maxPlant := 0
+	for i := 0; i < len(currentState); i++ {
+		if currentState[i] == '#' {
+			if i < minPlant {
+				minPlant = i
+			}
+			if i > maxPlant {
+				maxPlant = i
+			}
+			total += i - offset
 		}
 	}
 
 	fmt.Println("Total: ", total)
+	fmt.Println("Min Plant: ", minPlant-offset)
+	fmt.Println("Max Plant: ", maxPlant-offset)
 }
