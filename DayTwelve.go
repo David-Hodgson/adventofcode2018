@@ -28,14 +28,15 @@ func DayTwelvePartOne() {
 
 	}
 	fmt.Println("Initial State: ", initalState)
-	fmt.Println("Rules: ", rules)
+	//fmt.Println("Rules: ", rules)
+	fmt.Println(initalState)
 
 	currentState := initalState
-	offset := 100
+	offset := 10000
 	for padding := 0; padding < offset; padding++ {
 		currentState = "." + currentState + "."
 	}
-	for second := 1; second <= 20; second++ {
+	for second := 1; second <= 500; second++ {
 		fmt.Println(second, ":", " currentLength: ", len(currentState)+2)
 		currentState = currentState // + ".."
 		nextState := currentState
@@ -57,6 +58,20 @@ func DayTwelvePartOne() {
 		//	fmt.Println("\tNew Next State: ", nextState)
 		currentState = nextState
 
+		//fmt.Println(currentState)
+		//fmt.Println("")
+
+		plantCount := 0
+		plantTotal := 0
+		for pp := 0; pp<len(currentState); pp++ {
+			if currentState[pp] == '#' {
+				plantCount++
+				plantTotal += pp - offset
+			}
+		}
+		fmt.Println("Plant Count: ", plantCount)
+		fmt.Println("Plant Total: ", plantTotal)
+		//fmt.Println("")
 		//	if strings.Index(currentState, "#") <= 3 {
 		//		currentState = "." + currentState
 		//		offset++
