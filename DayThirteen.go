@@ -16,6 +16,7 @@ const (
 
 type cart struct {
 	x,y,direction, intersectionDirection int
+	removed bool
 }
 
 var (
@@ -47,6 +48,49 @@ func init() {
 
 }
 
+func DayThirteenPartTwo() {
+	fmt.Println("Day 13 - Part Two")
+
+	input := ReadFile("day13-input.txt")
+
+	inputRows := strings.Split(input, "\n")
+
+	carts,tracks := parseInput(inputRows)
+
+	for i := 0; i< 100000; i++ {
+
+		fmt.Println("Time: ", i)
+
+		validCarts := 0;
+		for x := 0; x <len(carts); x++ {
+			if (!carts[x].removed) {
+				fmt.Println("x:", carts[x].x, "y:",carts[x].y)
+				validCarts++
+			}
+		}
+		if validCarts == 1 {
+			break;
+		}
+		sort.Slice(carts, func(i,j int) bool {
+			if carts[i].y == carts[j].y {
+				return carts[i].x < carts[j].x
+			} else {
+				return carts[i].y < carts[j].y
+			}
+		})
+
+		for j :=0; j < len(carts); j++ {
+			cart := &carts[j]
+			if cart.removed {
+				continue
+			}
+
+			moveCart(cart,tracks)
+			checkForCollisions(carts) 
+		}
+	}
+}
+
 func DayThirteenPartOne() {
 	fmt.Println("Day 13 - Part One")
 
@@ -56,9 +100,8 @@ func DayThirteenPartOne() {
 
 	carts,tracks := parseInput(inputRows)
 
-	collision := false;
 
-	for i := 0; i< 1000&& !collision; i++ {
+	for i := 0; i< 1000; i++ {
 
 		fmt.Println("Time: ", i)
 
@@ -70,13 +113,11 @@ func DayThirteenPartOne() {
 			}
 		})
 
-		for j :=0; j < len(carts) && !collision  ; j++ {
+		for j :=0; j < len(carts); j++ {
 			cart := &carts[j]
 
 			moveCart(cart,tracks)
-			if  checkForCollisions(carts) {
-				collision = true
-			}
+			checkForCollisions(carts)
 		}
 	}
 }
@@ -101,6 +142,8 @@ func parseInput(inputRows []string) ([]cart, [][]string) {
 					newCart.y = row
 					newCart.x = col
 					newCart.intersectionDirection = Left
+					newCart.removed = false
+
 					if bob == ">" || bob == "<" {
 						tracks[row][col] = "-"
 
@@ -212,12 +255,20 @@ func checkForCollisions(carts []cart) bool {
 
 	collision := false;
 	for i :=0; i<len(carts)-1; i++ {
+		if carts[i].removed {
+			continue
+		}
 		for j := i+1; j<len(carts); j++ {
+			if carts[j].removed {
+				continue
+			}
 
 			if (carts[i].x == carts[j].x &&
 				carts[i].y == carts[j].y) {
 					collision = true
 					fmt.Println("Crash at: ", carts[i].x, ",", carts[i].y)
+					carts[i].removed = true
+					carts[j].removed = true
 			}
 		}
 	}
