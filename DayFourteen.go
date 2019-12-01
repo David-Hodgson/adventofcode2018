@@ -14,7 +14,7 @@ func DayFourteenPartOne() {
 	elf1 := 0
 	elf2 := 1
 
-	experiments := 190221
+	experiments := 59022100
 	recipesCount := 10;
 
 	for ; len(recipes) <(experiments+recipesCount); {
@@ -40,6 +40,13 @@ func DayFourteenPartOne() {
 	}
 
 	fmt.Println("Recipes: ", recipes[experiments:])
+
+	outString := strings.Trim(strings.Join(strings.Fields(fmt.Sprint(recipes)), ""), "[]")
+
+	ind := strings.Index(outString, "190221")
+	if ind != -1 {
+		fmt.Println("FOund: ", ind)
+	}
 }
 
 
